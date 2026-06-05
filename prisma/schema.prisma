@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+model User {
+  id           String    @id @default(cuid())
+  neonAuthId   String?   @unique
+  email        String    @unique
+  name         String
+  role         AdminRole @default(VIEWER)
+  permissions  String[]  @default([])
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model CmsSection {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  content   Json
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+model SiteSettings {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}

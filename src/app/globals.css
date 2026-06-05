@@ -1,0 +1,290 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #f7f5f0;
+  --color-foreground: #141210;
+  --color-muted: #6b6560;
+  --color-border: #e5e0d8;
+  --color-accent: #b8954a;
+  --color-accent-light: #f3ead8;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #efebe4;
+  --color-ink: #0a0908;
+  --color-cream: #f7f5f0;
+  --color-gold: #c9a962;
+  --color-gold-dark: #9a7b3c;
+  --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-playfair);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    overflow-x: hidden;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  ::selection {
+    background-color: rgb(201 169 98 / 0.35);
+    color: var(--color-foreground);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-playfair), Georgia, serif;
+  }
+
+  /* Mobile : sections plus compactes */
+  .section-padding {
+    @apply px-5 py-14 sm:px-8 sm:py-20 md:py-28 lg:px-12 xl:px-16;
+  }
+
+  .container-narrow {
+    @apply mx-auto max-w-5xl;
+  }
+
+  .container-wide {
+    @apply mx-auto max-w-[82rem];
+  }
+
+  .heading-section {
+    @apply font-display text-2xl font-medium leading-[1.15] tracking-tight text-foreground sm:text-4xl md:text-[2.85rem];
+  }
+
+  .divider-gold {
+    @apply h-px w-12 bg-gold;
+  }
+
+  /* Mobile : dégradé vertical pour lisibilité */
+  .hero-overlay-mobile {
+    background: linear-gradient(
+      to top,
+      rgb(10 9 8 / 0.97) 0%,
+      rgb(10 9 8 / 0.85) 35%,
+      rgb(10 9 8 / 0.55) 70%,
+      rgb(10 9 8 / 0.35) 100%
+    );
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      105deg,
+      rgb(10 9 8 / 0.92) 0%,
+      rgb(10 9 8 / 0.75) 45%,
+      rgb(10 9 8 / 0.35) 100%
+    );
+  }
+
+  .label-upper {
+    @apply text-[10px] font-semibold tracking-[0.15em] text-gold uppercase sm:text-[11px] sm:tracking-[0.2em];
+  }
+
+  /* Carrousel horizontal mobile */
+  .scroll-carousel {
+    @apply flex gap-3 overflow-x-auto overscroll-x-contain pb-2;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .scroll-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-filters {
+    scrollbar-width: none;
+  }
+
+  .scroll-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-strip {
+    @apply flex gap-4 overflow-x-auto overscroll-x-contain pb-1;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .scroll-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Bouton devis : pulsation légère + halo (sans scale → pas de débordement) */
+  @keyframes devis-pulse-scale {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes devis-glow-ring {
+    0%,
+    100% {
+      opacity: 0.6;
+      box-shadow:
+        inset 0 0 0 1px rgb(201 169 98 / 0.5),
+        0 0 8px rgb(201 169 98 / 0.2);
+    }
+    50% {
+      opacity: 1;
+      box-shadow:
+        inset 0 0 0 1px rgb(201 169 98 / 0.9),
+        0 0 14px rgb(201 169 98 / 0.45),
+        0 0 22px rgb(201 169 98 / 0.25);
+    }
+  }
+
+  @keyframes shimmer-line {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes float-soft {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  .devis-cta-wrap {
+    isolation: isolate;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .devis-cta-ring {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    animation: devis-glow-ring 2.4s ease-in-out infinite;
+  }
+
+  .devis-cta-inner {
+    position: relative;
+    max-width: 100%;
+    animation: devis-pulse-scale 2.4s ease-in-out infinite;
+    transform-origin: center center;
+  }
+
+  .devis-cta-wrap:hover .devis-cta-inner {
+    animation-duration: 1.6s;
+  }
+
+  .devis-cta-wrap:hover .devis-cta-ring {
+    animation-duration: 1.6s;
+  }
+
+  /* Mobile sticky devis */
+  .devis-cta-mobile {
+    position: relative;
+    isolation: isolate;
+    animation: devis-pulse-scale 2.4s ease-in-out infinite;
+  }
+
+  .devis-cta-mobile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    animation: devis-glow-ring 2.4s ease-in-out infinite;
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-500 ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+
+  .shimmer-hover {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer-hover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgb(255 255 255 / 0.12) 50%,
+      transparent 60%
+    );
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+
+  .shimmer-hover:hover::after {
+    animation: shimmer-line 0.85s ease-out;
+  }
+
+  /* Panel admin premium */
+  .admin-shell {
+    background: linear-gradient(
+      160deg,
+      var(--color-cream) 0%,
+      var(--color-surface-elevated) 45%,
+      var(--color-cream) 100%
+    );
+  }
+
+  .admin-main {
+    background-image: radial-gradient(
+      rgb(201 169 98 / 0.06) 1px,
+      transparent 1px
+    );
+    background-size: 24px 24px;
+  }
+
+  .admin-card {
+    border: 1px solid var(--color-border);
+  }
+
+  .admin-welcome {
+    background: linear-gradient(
+      115deg,
+      var(--color-ink) 0%,
+      rgb(30 28 26) 50%,
+      rgb(20 18 16) 100%
+    );
+  }
+
+  .admin-pipeline-col {
+    min-height: 12rem;
+    background: rgb(247 245 240 / 0.6);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .devis-cta-ring,
+    .devis-cta-inner,
+    .devis-cta-mobile,
+    .devis-cta-mobile::before {
+      animation: none !important;
+    }
+
+    .hover-lift:hover {
+      transform: none;
+    }
+  }
+}
