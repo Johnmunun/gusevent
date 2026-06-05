@@ -1,7 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { CheckCircle2, Mail, Phone } from "lucide-react";
+import { usePublicContact } from "@/components/contact/ContactProvider";
 import { brand } from "@/config/brand";
-import { contact, mailtoDevis, telLink } from "@/config/contact";
 
 const steps = [
   {
@@ -27,6 +29,8 @@ const steps = [
 ] as const;
 
 export function DevisSidebar() {
+  const { email, phoneDisplay, telLink, mailtoDevis } = usePublicContact();
+
   return (
     <aside className="flex flex-col gap-8 lg:sticky lg:top-28 lg:self-start">
       <div className="border border-border bg-ink p-8 text-cream">
@@ -64,7 +68,7 @@ export function DevisSidebar() {
               className="flex items-center gap-3 text-foreground transition-colors hover:text-gold"
             >
               <Phone className="h-4 w-4 shrink-0 text-gold" />
-              <span className="text-sm font-medium">{contact.phoneDisplay}</span>
+              <span className="text-sm font-medium">{phoneDisplay}</span>
             </a>
           </li>
           <li>
@@ -73,7 +77,7 @@ export function DevisSidebar() {
               className="flex items-start gap-3 break-all text-foreground transition-colors hover:text-gold"
             >
               <Mail className="h-4 w-4 shrink-0 text-gold" />
-              <span className="text-sm font-medium">{contact.email}</span>
+              <span className="text-sm font-medium">{email}</span>
             </a>
           </li>
         </ul>

@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Phone } from "lucide-react";
+import { MessageCircle, Phone } from "lucide-react";
 import { useDevisDrawer } from "@/components/devis/DevisDrawerProvider";
-import { contact, telLink } from "@/config/contact";
+import { usePublicContact } from "@/components/contact/ContactProvider";
 
 export function MobileStickyCTA() {
   const { open } = useDevisDrawer();
+  const { phoneDisplay, telLink, whatsappHref } = usePublicContact();
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-cream/95 p-3 backdrop-blur-lg md:hidden">
@@ -18,6 +19,17 @@ export function MobileStickyCTA() {
           <Phone className="h-4 w-4 text-gold" />
           Appeler
         </Link>
+        {whatsappHref ? (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-1 items-center justify-center gap-2 border border-border bg-surface py-3 text-sm font-medium text-foreground"
+          >
+            <MessageCircle className="h-4 w-4 text-gold" />
+            WhatsApp
+          </a>
+        ) : null}
         <button
           type="button"
           onClick={open}
@@ -27,7 +39,7 @@ export function MobileStickyCTA() {
         </button>
       </div>
       <p className="mt-1.5 text-center text-[10px] text-muted">
-        Réponse sous 24 h · {contact.phoneDisplay}
+        Réponse sous 24 h · {phoneDisplay}
       </p>
     </div>
   );

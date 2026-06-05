@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
 import { EmailSettingsForm } from "@/components/admin/settings/EmailSettingsForm";
+import { ContactSettingsForm } from "@/components/admin/settings/ContactSettingsForm";
 import { LogoSettingsForm } from "@/components/admin/settings/LogoSettingsForm";
 import type { SystemSettingsData } from "@/lib/system/service";
 
@@ -69,6 +70,10 @@ export function SettingsPageView() {
         className="lg:col-span-2"
       >
         <LogoSettingsForm />
+      </AdminCard>
+
+      <AdminCard title="Contact & réseaux" className="lg:col-span-2">
+        <ContactSettingsForm />
       </AdminCard>
 
       <AdminCard title="Identité">

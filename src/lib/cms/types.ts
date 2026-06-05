@@ -28,6 +28,8 @@ export type CmsHeroContent = {
   ctaSecondaryHref: string;
   backgroundImage: string;
   backgroundImageFallbacks: string[];
+  /** Vidéo courte (≤ 10 s recommandé), muette en boucle */
+  backgroundVideo?: string;
 };
 
 export type CmsSectionHeading = {

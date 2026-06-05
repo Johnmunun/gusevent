@@ -3,8 +3,8 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowRight, Send } from "lucide-react";
+import { usePublicContact } from "@/components/contact/ContactProvider";
 import { brand } from "@/config/brand";
-import { contact, mailtoDevis, telLink } from "@/config/contact";
 import {
   currencies,
   DEFAULT_BUDGET,
@@ -70,7 +70,9 @@ export function QuoteForm({
   const isDrawer = variant === "drawer";
   const isEdit = mode === "edit";
   const { showSuccess } = useToast();
+  const { email, phoneDisplay, telLink, mailtoDevis } = usePublicContact();
   const [form, setForm] = useState(initialData ?? createInitialState);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [savedReference, setSavedReference] = useState<string | null>(
     quoteReference ?? null
@@ -98,6 +100,11 @@ export function QuoteForm({
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
       setError("Veuillez saisir une adresse email valide.");
+      return;
+    }
+
+    if (!isEdit && !privacyAccepted) {
+      setError("Veuillez accepter la politique de confidentialité pour envoyer votre demande.");
       return;
     }
 
@@ -192,11 +199,11 @@ export function QuoteForm({
           Pas de réponse sous <strong className="text-foreground">2 heures</strong>{" "}
           ? Contactez notre support :{" "}
           <a href={telLink} className="text-foreground underline-offset-2 hover:text-gold hover:underline">
-            {contact.phoneDisplay}
+            {phoneDisplay}
           </a>
           {" "}ou{" "}
           <a href={mailtoDevis} className="text-foreground underline-offset-2 hover:text-gold hover:underline">
-            {contact.email}
+            {email}
           </a>
           .
         </p>
@@ -460,19 +467,43 @@ export function QuoteForm({
         pas de nouvelles sous <strong className="text-foreground">2 heures</strong>,
         contactez le support au{" "}
         <a href={telLink} className="text-foreground underline-offset-2 hover:text-gold hover:underline">
-          {contact.phoneDisplay}
+          {phoneDisplay}
         </a>
         {" "}ou par email à{" "}
         <a href={mailtoDevis} className="text-foreground underline-offset-2 hover:text-gold hover:underline">
-          {contact.email}
+          {email}
         </a>
         .
       </p>
 
+      {!isEdit ? (
+        <label className="mt-6 flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-muted">
+          <input
+            type="checkbox"
+            checked={privacyAccepted}
+            onChange={(e) => {
+              setPrivacyAccepted(e.target.checked);
+              setError(null);
+            }}
+            className="mt-1 h-4 w-4 shrink-0 accent-gold"
+            required
+          />
+          <span>
+            J&apos;accepte que mes données soient traitées par {brand.name} pour
+            répondre à ma demande de devis, conformément à la{" "}
+            <Link href="/confidentialite" className="text-foreground underline-offset-2 hover:text-gold hover:underline">
+              politique de confidentialité
+            </Link>
+            . <span className="text-gold">*</span>
+          </span>
+        </label>
+      ) : null}
+
       <div className="mt-6 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs leading-relaxed text-muted">
-          En envoyant ce formulaire, vous acceptez d&apos;être recontacté par{" "}
-          {brand.name} concernant votre projet.
+          {isEdit
+            ? `Les modifications seront transmises à l'équipe ${brand.name}.`
+            : `En envoyant ce formulaire, vous acceptez d'être recontacté par ${brand.name} concernant votre projet.`}
         </p>
         <button
           type="submit"

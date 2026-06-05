@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/Button";
 import { DevisButton } from "@/components/ui/DevisButton";
 import { HeroMobileImage } from "@/components/landing/HeroMobileImage";
 import { HeroVisual } from "@/components/landing/HeroVisual";
-import { MediaImage } from "@/components/ui/MediaImage";
-import { contact, mailtoDevis, telLink } from "@/config/contact";
+import { HeroBackground } from "@/components/landing/HeroBackground";
+import { usePublicContact } from "@/components/contact/ContactProvider";
 import { StatWithBackdrop } from "@/components/ui/StatWithBackdrop";
 import type { CmsHeroContent, CmsStatItem } from "@/lib/cms/types";
 import { defaultLandingCms } from "@/lib/cms/defaults";
@@ -21,23 +21,11 @@ export function Hero({
   content = defaultLandingCms.hero,
   stats = defaultLandingCms.stats,
 }: HeroProps) {
+  const { email, phoneDisplay, telLink, mailtoDevis } = usePublicContact();
+
   return (
     <section className="relative isolate w-full max-w-[100vw] overflow-x-clip bg-ink">
-      {/* Fond */}
-      <div className="absolute inset-0 min-h-full">
-        <MediaImage
-          src={content.backgroundImage}
-          sources={content.backgroundImageFallbacks}
-          localOnly
-          alt=""
-          fill
-          priority
-          className="object-cover object-center opacity-55 sm:opacity-60"
-          sizes="100vw"
-        />
-        <div className="hero-overlay-mobile absolute inset-0 md:hidden" />
-        <div className="hero-overlay absolute inset-0 hidden md:block" />
-      </div>
+      <HeroBackground content={content} />
 
       {/* Contenu */}
       <div className="relative z-10 mx-auto w-full min-w-0 max-w-[82rem] box-border px-4 pb-24 pt-[calc(4.5rem+1.25rem)] sm:px-6 sm:pb-28 sm:pt-[calc(4.5rem+2rem)] md:px-8 md:pb-32 md:pt-32 lg:flex lg:min-h-screen lg:items-center lg:px-12 lg:pt-36 xl:px-16">
@@ -127,14 +115,14 @@ export function Hero({
                 className="inline-flex min-w-0 items-center gap-2 text-sm text-stone-400 hover:text-gold"
               >
                 <Phone className="h-4 w-4 shrink-0 text-gold" />
-                <span className="truncate">{contact.phoneDisplay}</span>
+                <span className="truncate">{phoneDisplay}</span>
               </a>
               <a
                 href={mailtoDevis}
                 className="inline-flex min-w-0 items-center gap-2 text-sm text-stone-400 hover:text-gold"
               >
                 <Mail className="h-4 w-4 shrink-0 text-gold" />
-                <span className="break-all">{contact.email}</span>
+                <span className="break-all">{email}</span>
               </a>
             </motion.div>
           </div>

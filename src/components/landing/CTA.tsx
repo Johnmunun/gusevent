@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Mail, Phone } from "lucide-react";
 import { DevisButton } from "@/components/ui/DevisButton";
-import { contact, mailtoDevis, telLink } from "@/config/contact";
+import { usePublicContact } from "@/components/contact/ContactProvider";
 import { defaultLandingCms } from "@/lib/cms/defaults";
 import type { CmsCtaContent } from "@/lib/cms/types";
 
@@ -12,6 +12,9 @@ type CtaProps = {
 };
 
 export function CTA({ content = defaultLandingCms.cta }: CtaProps) {
+  const { phoneDisplay, email, telLink, mailtoDevis, whatsappHref } =
+    usePublicContact();
+
   return (
     <section id="contact" className="section-padding bg-surface-elevated">
       <div className="container-wide">
@@ -41,7 +44,7 @@ export function CTA({ content = defaultLandingCms.cta }: CtaProps) {
                 href={telLink}
                 className="mt-2 block font-display text-2xl transition-colors hover:text-gold"
               >
-                {contact.phoneDisplay}
+                {phoneDisplay}
               </a>
             </div>
             <div>
@@ -50,9 +53,22 @@ export function CTA({ content = defaultLandingCms.cta }: CtaProps) {
                 href={mailtoDevis}
                 className="mt-2 block text-lg transition-colors hover:text-gold"
               >
-                {contact.email}
+                {email}
               </a>
             </div>
+            {whatsappHref ? (
+              <div>
+                <p className="label-upper text-gold">WhatsApp</p>
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 block text-lg transition-colors hover:text-gold"
+                >
+                  Écrire sur WhatsApp
+                </a>
+              </div>
+            ) : null}
             <div className="flex gap-6 pt-4">
               <Phone className="h-5 w-5 text-gold" />
               <Mail className="h-5 w-5 text-gold" />

@@ -29,12 +29,13 @@ export const defaultLandingCms: LandingCmsContent = {
     ctaSecondaryHref: "/#realisations",
     backgroundImage: media.hero.image,
     backgroundImageFallbacks: [...media.hero.imageFallbacks],
+    backgroundVideo: "",
   },
   stats: [
     { label: "Projets réalisés", value: 8, suffix: "", backdrop: "8" },
-    { label: "Clients satisfaits", value: 620, suffix: "+" },
+    { label: "Clients accompagnés", value: 30, suffix: "+" },
     { label: "Depuis", value: 2023, suffix: "" },
-    { label: "Partenaires", value: 45, suffix: "+" },
+    { label: "Expertises", value: 7, suffix: "" },
   ],
   services: {
     heading: {
@@ -227,8 +228,6 @@ export const defaultLandingCms: LandingCmsContent = {
     ],
     socialLinks: [
       { label: "Instagram", href: "https://www.instagram.com/gus_event/" },
-      { label: "LinkedIn", href: "https://linkedin.com" },
-      { label: "Facebook", href: "https://facebook.com" },
     ],
   },
 };

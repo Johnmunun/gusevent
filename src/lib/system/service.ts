@@ -1,6 +1,6 @@
 import type { AdminRole } from "@prisma/client";
 import { brand } from "@/config/brand";
-import { contact } from "@/config/contact";
+import { getContactSettings } from "@/lib/settings/contact-settings";
 import { isNeonAuthConfigured } from "@/lib/auth/server";
 import {
   ROLE_DESCRIPTIONS,
@@ -117,9 +117,10 @@ export async function getSystemAccessData(): Promise<SystemAccessData> {
 }
 
 export async function getSystemSettingsData(): Promise<SystemSettingsData> {
-  const [email, cms] = await Promise.all([
+  const [email, cms, contact] = await Promise.all([
     getEmailSettings(),
     getLandingCms(),
+    getContactSettings(),
   ]);
 
   return {
@@ -132,8 +133,8 @@ export async function getSystemSettingsData(): Promise<SystemSettingsData> {
       email: contact.email,
       phone: contact.phone,
       phoneDisplay: contact.phoneDisplay,
-      addressLine1: contact.address.line1,
-      addressLine2: contact.address.line2,
+      addressLine1: contact.addressLine1,
+      addressLine2: contact.addressLine2,
     },
     publicCta: {
       eyebrow: cms.cta.eyebrow,

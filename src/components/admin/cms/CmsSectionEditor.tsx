@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { CmsImageField } from "@/components/admin/cms/CmsImageField";
+import { CmsVideoField } from "@/components/admin/cms/CmsVideoField";
 import { GalleryCmsEditor } from "@/components/admin/cms/GalleryCmsEditor";
 import {
   CmsFormField,
@@ -163,6 +164,12 @@ function HeroEditor({
           }
           setContent(patch);
         }}
+      />
+      <CmsVideoField
+        label="Vidéo de fond (optionnel, ≤ 10 s)"
+        value={String(content.backgroundVideo ?? "")}
+        onChange={(url) => set("backgroundVideo", url)}
+        hint="Stockée sur Cloudinary (pas sur Vercel). Vidéo courte, muette, en boucle. Si absente, l'image de fond s'affiche."
       />
     </div>
   );

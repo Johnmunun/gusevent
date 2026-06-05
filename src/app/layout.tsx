@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
 import { brand } from "@/config/brand";
+import { getSiteUrl, siteMetadataDefaults } from "@/lib/site/metadata";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -16,22 +17,28 @@ const playfair = Playfair_Display({
   style: ["normal", "italic"],
 });
 
+const siteUrl = getSiteUrl();
+
 export const metadata: Metadata = {
-  title: `${brand.name} — Agence événementielle premium`,
-  description:
-    "De la conception à la réalisation, nous transformons vos idées en expériences mémorables. Mariages, corporate, concerts et plus.",
-  keywords: [
-    "agence événementielle",
-    "organisation événements",
-    "mariage",
-    "corporate",
-    "décoration événement",
-  ],
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteMetadataDefaults.title,
+    template: `%s — ${brand.name}`,
+  },
+  description: siteMetadataDefaults.description,
+  keywords: siteMetadataDefaults.keywords,
   openGraph: {
     title: `${brand.name} — Événements inoubliables`,
-    description:
-      "Agence événementielle premium : organisation, décoration et gestion complète.",
+    description: siteMetadataDefaults.description,
     type: "website",
+    locale: "fr_FR",
+    siteName: brand.name,
+    url: siteUrl,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${brand.name} — Événements inoubliables`,
+    description: siteMetadataDefaults.description,
   },
 };
 

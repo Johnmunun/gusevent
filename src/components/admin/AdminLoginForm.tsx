@@ -29,11 +29,19 @@ export function AdminLoginForm() {
       });
 
       if (signInError) {
-        setError(
-          signInError.message?.includes("Invalid email or password")
-            ? "Email ou mot de passe incorrect."
-            : signInError.message ?? "Connexion impossible."
-        );
+        const msg = signInError.message ?? "";
+        if (msg.includes("Invalid email or password")) {
+          setError("Email ou mot de passe incorrect.");
+        } else if (
+          msg.includes("Invalid origin") ||
+          signInError.code === "INVALID_ORIGIN"
+        ) {
+          setError(
+            "Origine non autorisée pour Neon Auth. Ajoutez https://gusevent.vercel.app dans Neon Console → Auth → Configuration → Domains, vérifiez NEXT_PUBLIC_APP_URL sur Vercel, puis redéployez."
+          );
+        } else {
+          setError(msg || "Connexion impossible.");
+        }
         return;
       }
 

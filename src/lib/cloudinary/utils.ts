@@ -20,3 +20,17 @@ export function cloudinaryPreviewUrl(url: string): string {
   }
   return url;
 }
+
+/** URL vidéo optimisée pour lecture web (hero, etc.). */
+export function cloudinaryVideoUrl(url: string): string {
+  if (!isCloudinaryUrl(url)) return url;
+  const marker = "/video/upload/";
+  if (
+    url.includes(marker) &&
+    !url.includes("/upload/q_") &&
+    !url.includes("/upload/c_")
+  ) {
+    return url.replace(marker, "/video/upload/q_auto,f_auto/");
+  }
+  return url;
+}

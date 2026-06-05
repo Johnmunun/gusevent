@@ -27,7 +27,8 @@ export const media = {
     image: `${base}/hero/hero.jpg`,
     visualMain: `${base}/hero/visual-1.jpg`,
     visualSmall: `${base}/hero/visual-2.jpg`,
-    video: `${base}/hero/hero-video.mp4`,
+    /** Vidéo hero : Admin → CMS → Bannière (upload Cloudinary uniquement) */
+    video: "",
     imageFallbacks: [
       `${base}/gallery/10.jpeg`,
       `${base}/gallery/11.jpeg`,
