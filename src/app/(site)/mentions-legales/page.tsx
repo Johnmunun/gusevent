@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/config/brand";
 import { getContactSettings } from "@/lib/settings/contact-settings";
-import { getSiteUrl, siteMetadataDefaults } from "@/lib/site/metadata";
+import { getSiteUrl } from "@/lib/site/metadata";
 
 export const metadata: Metadata = {
   title: `Mentions légales — ${brand.name}`,

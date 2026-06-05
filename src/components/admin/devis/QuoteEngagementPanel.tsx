@@ -68,7 +68,7 @@ export function QuoteEngagementPanel({
     return () => {
       cancelled = true;
     };
-  }, [quoteId]);
+  }, [quoteId, showError]);
 
   async function createInvite(sendEmail: boolean) {
     setInviteLoading(true);

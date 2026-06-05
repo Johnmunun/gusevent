@@ -29,10 +29,9 @@ export async function PATCH(
     );
   }
 
-  const quote = await findQuoteByReferenceAndEmail(
-    reference,
-    parsed.data.verifyEmail
-  );
+  const { verifyEmail, ...fields } = parsed.data;
+
+  const quote = await findQuoteByReferenceAndEmail(reference, verifyEmail);
 
   if (!quote) {
     return NextResponse.json(
@@ -47,8 +46,6 @@ export async function PATCH(
       { status: 403 }
     );
   }
-
-  const { verifyEmail: _verify, ...fields } = parsed.data;
 
   try {
     const updated = await updateQuoteRequest(quote, fields);
