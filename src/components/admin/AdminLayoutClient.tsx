@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { AdminAppProvider } from "@/components/admin/AdminAppProvider";
+import { ToastProvider } from "@/components/ui/toast-context";
 
 const PUBLIC_ADMIN_PATHS = ["/admin/login", "/admin/unauthorized"];
 
@@ -16,5 +17,9 @@ export function AdminLayoutClient({
     return <>{children}</>;
   }
 
-  return <AdminAppProvider>{children}</AdminAppProvider>;
+  return (
+    <ToastProvider>
+      <AdminAppProvider>{children}</AdminAppProvider>
+    </ToastProvider>
+  );
 }

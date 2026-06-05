@@ -2,22 +2,26 @@ import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { brand } from "@/config/brand";
 import { contact, mailtoDevis, telLink } from "@/config/contact";
-import { Logo } from "@/components/ui/Logo";
+import { Logo, type LogoBranding } from "@/components/ui/Logo";
 import { defaultLandingCms } from "@/lib/cms/defaults";
 import type { CmsFooterContent } from "@/lib/cms/types";
 
 type FooterProps = {
   content?: CmsFooterContent;
+  branding?: LogoBranding;
 };
 
-export function Footer({ content = defaultLandingCms.footer }: FooterProps) {
+export function Footer({
+  content = defaultLandingCms.footer,
+  branding,
+}: FooterProps) {
   return (
     <footer className="bg-ink text-stone-400">
       <div className="h-px w-full bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
       <div className="section-padding pb-12 pt-16">
         <div className="container-wide grid gap-14 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Logo variant="light" />
+            <Logo variant="light" branding={branding} showText={false} />
             <p className="mt-6 max-w-xs text-sm leading-relaxed">{content.tagline}</p>
             <div className="mt-8 flex gap-6">
               {content.socialLinks.map((social) => (

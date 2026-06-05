@@ -6,6 +6,8 @@ import { authClient } from "@/lib/auth/client";
 import type { AppSession } from "@/lib/auth/app-session";
 import { AdminAppContext } from "@/components/admin/admin-app-context";
 
+const ME_TIMEOUT_MS = 30000;
+
 type AdminAppProviderProps = {
   children: React.ReactNode;
 };
@@ -34,33 +36,57 @@ export function AdminAppProvider({ children }: AdminAppProviderProps) {
     }
 
     let cancelled = false;
+    let timedOut = false;
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    const timeout = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, ME_TIMEOUT_MS);
 
     fetch("/api/admin/me", { signal: controller.signal })
       .then(async (res) => {
         clearTimeout(timeout);
         if (cancelled) return;
-        if (!res.ok) {
+
+        if (res.status === 401) {
           router.replace("/admin/unauthorized");
           return;
         }
+
+        if (!res.ok) {
+          router.replace(
+            `/admin/login?error=db&callbackUrl=${encodeURIComponent(pathname)}`
+          );
+          return;
+        }
+
         const data = (await res.json()) as AppSession;
         setAppSession(data);
         setChecking(false);
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         clearTimeout(timeout);
-        if (!cancelled) {
-          router.replace(
-            "/admin/login?error=db&callbackUrl=" + encodeURIComponent(pathname)
-          );
+        if (cancelled) return;
+
+        if (err instanceof Error && err.name === "AbortError") {
+          if (timedOut) {
+            router.replace(
+              `/admin/login?error=slow&callbackUrl=${encodeURIComponent(pathname)}`
+            );
+          }
+          return;
         }
+
+        router.replace(
+          `/admin/login?error=db&callbackUrl=${encodeURIComponent(pathname)}`
+        );
       });
 
     return () => {
       cancelled = true;
+      clearTimeout(timeout);
+      controller.abort();
     };
   }, [isPending, neonSession, pathname, router, isLogin, isUnauthorized]);
 

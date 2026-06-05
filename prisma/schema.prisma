@@ -40,3 +40,96 @@ model SiteSettings {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+enum QuoteRequestStatus {
+  NEW
+  IN_PROGRESS
+  REPLIED
+  CLOSED
+}
+
+enum TestimonialSubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model QuoteRequest {
+  id               String             @id @default(cuid())
+  reference        String             @unique
+  fullName         String
+  email            String
+  phone            String
+  company          String?
+  eventType        String
+  eventDate        String?
+  guestCount       String?
+  currency         String
+  budget           String
+  budgetLabel      String
+  location         String?
+  message          String?
+  status           QuoteRequestStatus @default(NEW)
+  shareEnabled     Boolean            @default(false)
+  clientEmailSent  Boolean            @default(false)
+  adminEmailSent   Boolean            @default(false)
+  clientEmailError String?
+  adminEmailError  String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  testimonialSubmissions TestimonialSubmission[]
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+model TestimonialSubmission {
+  id               String                      @id @default(cuid())
+  token            String                      @unique
+  quoteId          String?
+  quoteReference   String?
+  clientEmail      String?
+  prefillName      String?
+  prefillCompany   String?
+  status           TestimonialSubmissionStatus @default(PENDING)
+  submitterName    String?
+  submitterRole    String?
+  submitterCompany String?
+  text             String?
+  image            String?
+  submittedAt      DateTime?
+  inviteEmailSent  Boolean                     @default(false)
+  inviteEmailError String?
+  createdAt        DateTime                    @default(now())
+  updatedAt        DateTime                    @updatedAt
+
+  quote QuoteRequest? @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([quoteId])
+}
+
+model AdminNotification {
+  id        String   @id @default(cuid())
+  type      String
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  @@index([read, createdAt])
+}
+
+model EventReminderLog {
+  id          String   @id @default(cuid())
+  quoteId     String
+  reminderKey String
+  emailed     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@unique([quoteId, reminderKey])
+  @@index([quoteId])
+}

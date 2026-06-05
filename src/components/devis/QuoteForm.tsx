@@ -4,8 +4,8 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowRight, Send } from "lucide-react";
 import { brand } from "@/config/brand";
+import { contact, mailtoDevis, telLink } from "@/config/contact";
 import {
-  buildQuoteMailto,
   currencies,
   DEFAULT_BUDGET,
   DEFAULT_CURRENCY,
@@ -17,6 +17,7 @@ import {
   type QuoteFormData,
 } from "@/lib/quote";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/toast-context";
 
 const inputClass =
   "w-full border border-border bg-surface px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-stone-400 focus:border-gold/60 focus:ring-1 focus:ring-gold/30";
@@ -51,13 +52,30 @@ function createInitialState(): QuoteFormData {
 
 type QuoteFormProps = {
   variant?: "page" | "drawer";
+  mode?: "create" | "edit";
+  initialData?: QuoteFormData;
+  quoteReference?: string;
+  verifyEmail?: string;
   onSubmitted?: () => void;
 };
 
-export function QuoteForm({ variant = "page", onSubmitted }: QuoteFormProps) {
+export function QuoteForm({
+  variant = "page",
+  mode = "create",
+  initialData,
+  quoteReference,
+  verifyEmail,
+  onSubmitted,
+}: QuoteFormProps) {
   const isDrawer = variant === "drawer";
-  const [form, setForm] = useState(createInitialState);
+  const isEdit = mode === "edit";
+  const { showSuccess } = useToast();
+  const [form, setForm] = useState(initialData ?? createInitialState);
   const [submitted, setSubmitted] = useState(false);
+  const [savedReference, setSavedReference] = useState<string | null>(
+    quoteReference ?? null
+  );
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const budgetOptions = getBudgetOptions(form.currency ?? DEFAULT_CURRENCY);
 
@@ -69,7 +87,7 @@ export function QuoteForm({ variant = "page", onSubmitted }: QuoteFormProps) {
     setError(null);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -83,19 +101,57 @@ export function QuoteForm({ variant = "page", onSubmitted }: QuoteFormProps) {
       return;
     }
 
-    const mailto = buildQuoteMailto({
+    setSubmitting(true);
+    const payload = {
       ...form,
       fullName: form.fullName.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
-      company: form.company?.trim(),
+      company: form.company?.trim() || "",
       location: form.location.trim(),
       message: form.message.trim(),
-    });
+    };
 
-    window.location.href = mailto;
-    setSubmitted(true);
-    onSubmitted?.();
+    try {
+      const res = await fetch(
+        isEdit && quoteReference
+          ? `/api/quotes/${encodeURIComponent(quoteReference)}`
+          : "/api/quotes",
+        {
+          method: isEdit ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(
+            isEdit ? { ...payload, verifyEmail: verifyEmail } : payload
+          ),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setError(
+          data.error ??
+            (isEdit
+              ? "Impossible de mettre à jour la demande."
+              : "Impossible d'envoyer la demande.")
+        );
+        return;
+      }
+      const ref = data.reference ?? quoteReference ?? null;
+      setSavedReference(ref);
+      showSuccess(
+        isEdit
+          ? "Votre demande a bien été mise à jour"
+          : "Votre demande de devis a bien été envoyée",
+        ref
+          ? `Référence ${ref}. L'équipe ${brand.name} vous recontacte très rapidement.`
+          : `L'équipe ${brand.name} a bien reçu votre demande et vous recontacte très rapidement.`
+      );
+      setSubmitted(true);
+      onSubmitted?.();
+    } catch {
+      setError("Erreur réseau. Vérifiez votre connexion et réessayez.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -106,18 +162,43 @@ export function QuoteForm({ variant = "page", onSubmitted }: QuoteFormProps) {
           isDrawer ? "p-6 sm:p-8" : "border border-border p-10 sm:p-14"
         )}
       >
-        <p className="label-upper text-gold">Demande envoyée</p>
+        <p className="label-upper text-gold">
+          {isEdit ? "Demande mise à jour" : "Demande envoyée"}
+        </p>
         <h2 className="mt-4 font-display text-3xl font-medium text-foreground">
-          Merci pour votre confiance
+          {isEdit ? "Modifications enregistrées" : "Merci pour votre confiance"}
         </h2>
         <p className="mt-4 max-w-lg text-muted leading-relaxed">
-          Votre application mail s&apos;est ouverte avec le récapitulatif de
-          votre demande. Envoyez le message pour que l&apos;équipe {brand.name}{" "}
-          vous réponde sous 24 heures.
+          {isEdit ? "Votre demande a bien été mise à jour" : "Votre demande a bien été enregistrée"}
+          {savedReference ? (
+            <>
+              {" "}
+              (réf. <strong className="text-foreground">{savedReference}</strong>)
+            </>
+          ) : null}
+          . L&apos;équipe {brand.name} vous recontactera dans les meilleurs
+          délais. Un email de confirmation vous sera envoyé si disponible.
         </p>
-        <p className="mt-6 text-sm text-muted">
-          Le message n&apos;est pas parti ? Vérifiez que vous avez bien cliqué
-          sur « Envoyer » dans votre boîte mail.
+        {!isEdit && savedReference ? (
+          <Link
+            href={`/devis/modifier?ref=${encodeURIComponent(savedReference)}`}
+            className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-foreground underline-offset-4 hover:text-gold hover:underline"
+          >
+            Modifier budget ou détails plus tard
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        ) : null}
+        <p className="mt-6 border border-border bg-cream/50 px-4 py-3 text-sm leading-relaxed text-muted">
+          Pas de réponse sous <strong className="text-foreground">2 heures</strong>{" "}
+          ? Contactez notre support :{" "}
+          <a href={telLink} className="text-foreground underline-offset-2 hover:text-gold hover:underline">
+            {contact.phoneDisplay}
+          </a>
+          {" "}ou{" "}
+          <a href={mailtoDevis} className="text-foreground underline-offset-2 hover:text-gold hover:underline">
+            {contact.email}
+          </a>
+          .
         </p>
         <Link
           href="/"
@@ -143,14 +224,20 @@ export function QuoteForm({ variant = "page", onSubmitted }: QuoteFormProps) {
     >
       {!isDrawer && (
         <>
-          <p className="label-upper">Formulaire</p>
+          <p className="label-upper">{isEdit ? "Modification" : "Formulaire"}</p>
           <h2 className="mt-4 font-display text-2xl font-medium text-foreground sm:text-3xl">
-            Décrivez votre événement
+            {isEdit ? "Mettre à jour votre demande" : "Décrivez votre événement"}
           </h2>
           <p className="mt-3 text-sm text-muted leading-relaxed">
-            Plus votre brief est précis, plus notre proposition sera adaptée à
-            vos attentes.
+            {isEdit
+              ? "Ajustez le budget, la date ou les détails de votre projet. Notre équipe sera notifiée."
+              : "Plus votre brief est précis, plus notre proposition sera adaptée à vos attentes."}
           </p>
+          {isEdit && quoteReference ? (
+            <p className="mt-2 text-xs text-muted">
+              Référence : <strong className="text-foreground">{quoteReference}</strong>
+            </p>
+          ) : null}
         </>
       )}
 
@@ -368,16 +455,37 @@ export function QuoteForm({ variant = "page", onSubmitted }: QuoteFormProps) {
         </p>
       )}
 
-      <div className="mt-10 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
+      <p className="mt-8 border border-border bg-cream/40 px-4 py-3 text-xs leading-relaxed text-muted">
+        Après envoi, notre équipe vous recontacte rapidement. Si vous n&apos;avez
+        pas de nouvelles sous <strong className="text-foreground">2 heures</strong>,
+        contactez le support au{" "}
+        <a href={telLink} className="text-foreground underline-offset-2 hover:text-gold hover:underline">
+          {contact.phoneDisplay}
+        </a>
+        {" "}ou par email à{" "}
+        <a href={mailtoDevis} className="text-foreground underline-offset-2 hover:text-gold hover:underline">
+          {contact.email}
+        </a>
+        .
+      </p>
+
+      <div className="mt-6 flex flex-col gap-4 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs leading-relaxed text-muted">
           En envoyant ce formulaire, vous acceptez d&apos;être recontacté par{" "}
           {brand.name} concernant votre projet.
         </p>
         <button
           type="submit"
-          className="inline-flex shrink-0 items-center justify-center gap-2 bg-gold px-8 py-3.5 text-sm font-medium tracking-wide text-ink transition-colors hover:bg-gold-dark"
+          disabled={submitting}
+          className="inline-flex shrink-0 items-center justify-center gap-2 bg-gold px-8 py-3.5 text-sm font-medium tracking-wide text-ink transition-colors hover:bg-gold-dark disabled:opacity-60"
         >
-          Envoyer ma demande
+          {submitting
+            ? isEdit
+              ? "Enregistrement…"
+              : "Envoi en cours…"
+            : isEdit
+              ? "Enregistrer les modifications"
+              : "Envoyer ma demande"}
           <Send className="h-4 w-4" />
         </button>
       </div>

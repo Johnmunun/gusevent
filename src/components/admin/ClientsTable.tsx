@@ -1,11 +1,18 @@
+"use client";
+
+import Link from "next/link";
 import {
   clientStatusLabels,
   clientStatusStyles,
-  mockClients,
-  type MockClient,
+  type ClientStatus,
 } from "@/data/admin-mock";
+import type { AdminClient } from "@/lib/clients/service";
+
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", {
+  if (!iso) return "—";
+  const parsed = new Date(iso);
+  if (Number.isNaN(parsed.getTime())) return iso;
+  return parsed.toLocaleDateString("fr-FR", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -20,7 +27,7 @@ function Avatar({ name }: { name: string }) {
   );
 }
 
-function StatusBadge({ status }: { status: MockClient["status"] }) {
+function StatusBadge({ status }: { status: ClientStatus }) {
   return (
     <span
       className={`inline-block px-2.5 py-1 text-[10px] font-semibold tracking-wide uppercase ${clientStatusStyles[status]}`}
@@ -30,7 +37,21 @@ function StatusBadge({ status }: { status: MockClient["status"] }) {
   );
 }
 
-export function ClientsTable() {
+type ClientsTableProps = {
+  clients: AdminClient[];
+  onStatusChange: (quoteId: string, status: ClientStatus) => void;
+};
+
+export function ClientsTable({ clients, onStatusChange }: ClientsTableProps) {
+  if (clients.length === 0) {
+    return (
+      <p className="admin-card bg-surface px-6 py-12 text-center text-sm text-muted">
+        Aucun client pour le moment. Les demandes de devis apparaissent ici
+        automatiquement.
+      </p>
+    );
+  }
+
   return (
     <>
       <div className="admin-card hidden overflow-hidden bg-surface md:block">
@@ -46,7 +67,7 @@ export function ClientsTable() {
             </tr>
           </thead>
           <tbody>
-            {mockClients.map((client) => (
+            {clients.map((client) => (
               <tr
                 key={client.id}
                 className="border-b border-border/60 transition-colors last:border-0 hover:bg-accent-light/25"
@@ -64,6 +85,11 @@ export function ClientsTable() {
                         )}
                       </p>
                       <p className="text-xs text-muted">{client.email}</p>
+                      {client.quotesCount > 1 ? (
+                        <p className="text-[10px] text-muted">
+                          {client.quotesCount} demandes
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                 </td>
@@ -73,15 +99,30 @@ export function ClientsTable() {
                 </td>
                 <td className="px-5 py-4 text-muted">{client.budget}</td>
                 <td className="px-5 py-4">
-                  <StatusBadge status={client.status} />
+                  <select
+                    value={client.status}
+                    onChange={(e) =>
+                      onStatusChange(
+                        client.quoteId,
+                        e.target.value as ClientStatus
+                      )
+                    }
+                    className="border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-gold/50"
+                  >
+                    {Object.entries(clientStatusLabels).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
                 </td>
                 <td className="px-5 py-4">
-                  <button
-                    type="button"
+                  <Link
+                    href={`/admin/devis?edit=${client.quoteId}`}
                     className="text-xs font-medium text-gold hover:underline"
                   >
                     Ouvrir
-                  </button>
+                  </Link>
                 </td>
               </tr>
             ))}
@@ -90,7 +131,7 @@ export function ClientsTable() {
       </div>
 
       <div className="space-y-3 md:hidden">
-        {mockClients.map((client) => (
+        {clients.map((client) => (
           <article key={client.id} className="admin-card bg-surface p-4">
             <div className="flex items-start gap-3">
               <Avatar name={client.name} />
@@ -101,6 +142,12 @@ export function ClientsTable() {
                 </div>
                 <p className="text-xs text-muted">{client.eventType}</p>
                 <p className="mt-2 text-xs text-muted">{client.budget}</p>
+                <Link
+                  href={`/admin/devis?edit=${client.quoteId}`}
+                  className="mt-3 inline-block text-xs font-medium text-gold hover:underline"
+                >
+                  Ouvrir la demande
+                </Link>
               </div>
             </div>
           </article>

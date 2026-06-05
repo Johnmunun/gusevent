@@ -6,6 +6,8 @@ import { WhyChooseUs } from "@/components/landing/WhyChooseUs";
 import { CTA } from "@/components/landing/CTA";
 import { getLandingCms } from "@/lib/cms/get-content";
 
+export const revalidate = 0;
+
 export default async function HomePage() {
   const cms = await getLandingCms();
 

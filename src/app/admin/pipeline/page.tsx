@@ -5,7 +5,7 @@ export default function AdminPipelinePage() {
   return (
     <AdminShell
       title="Pipeline ventes"
-      description="Suivez chaque prospect du premier contact à l'événement confirmé."
+      description="Suivez chaque demande de devis du premier contact à l'événement terminé."
     >
       <PipelineBoard />
     </AdminShell>

@@ -241,12 +241,51 @@
 
   /* Panel admin premium */
   .admin-shell {
+    --admin-sidebar-width: 22rem;
     background: linear-gradient(
       160deg,
       var(--color-cream) 0%,
       var(--color-surface-elevated) 45%,
       var(--color-cream) 100%
     );
+  }
+
+  .admin-sidebar-nav {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .admin-sidebar-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .toast-enter {
+    animation: toast-in 0.3s ease-out;
+  }
+
+  @keyframes sidebar-badge-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(201 169 98 / 0.45);
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgb(201 169 98 / 0);
+    }
+  }
+
+  .sidebar-badge-pending {
+    animation: sidebar-badge-pulse 2s ease-in-out infinite;
   }
 
   .admin-main {
@@ -273,6 +312,14 @@
   .admin-pipeline-col {
     min-height: 12rem;
     background: rgb(247 245 240 / 0.6);
+  }
+
+  .admin-pipeline-progress-track {
+    border-radius: 9999px;
+  }
+
+  .admin-pipeline-progress-fill {
+    border-radius: 9999px;
   }
 
   @media (prefers-reduced-motion: reduce) {

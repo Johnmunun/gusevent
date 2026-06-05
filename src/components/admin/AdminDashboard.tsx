@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import {
   ActivityFeed,
@@ -15,9 +17,9 @@ import {
   PipelineChart,
   RevenueChartAnimated,
 } from "@/components/admin/DashboardCharts";
-import { adminDashboardStats } from "@/data/admin-mock";
-import { brand } from "@/config/brand";
 import { quickActions } from "@/data/admin-mock";
+import { brand } from "@/config/brand";
+import type { DashboardData } from "@/lib/dashboard/service";
 
 function WelcomeBanner() {
   const date = new Date().toLocaleDateString("fr-FR", {
@@ -62,48 +64,84 @@ function WelcomeBanner() {
   );
 }
 
+function DashboardSkeleton() {
+  return (
+    <p className="flex items-center gap-2 py-12 text-sm text-muted">
+      <Loader2 className="h-4 w-4 animate-spin" />
+      Chargement du tableau de bord…
+    </p>
+  );
+}
+
 export function AdminDashboard() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/dashboard", { cache: "no-store", credentials: "same-origin" })
+      .then((res) => {
+        if (!res.ok) throw new Error("fetch failed");
+        return res.json();
+      })
+      .then((json: DashboardData) => setData(json))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <>
       <WelcomeBanner />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-        {adminDashboardStats.map((stat, index) => (
-          <AdminStatCard
-            key={stat.label}
-            index={index}
-            label={stat.label}
-            value={stat.value}
-            suffix={"suffix" in stat ? stat.suffix : undefined}
-            hint={stat.hint}
-            trend={stat.trend}
-          />
-        ))}
-      </div>
+      {loading && <DashboardSkeleton />}
 
-      <div className="mt-8 grid gap-6 xl:grid-cols-2">
-        <RevenueChartAnimated />
-        <LeadsChartAnimated />
-      </div>
+      {error && !loading && (
+        <p className="admin-card mb-6 bg-surface px-6 py-4 text-sm text-muted">
+          Impossible de charger les données. Réessayez dans un instant.
+        </p>
+      )}
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <PipelineChart />
-        </div>
-        <EventTypeChart />
-      </div>
+      {data && !loading && (
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+            {data.stats.map((stat, index) => (
+              <AdminStatCard
+                key={stat.label}
+                index={index}
+                label={stat.label}
+                value={stat.value}
+                suffix={stat.suffix}
+                hint={stat.hint}
+                trend={stat.trend}
+              />
+            ))}
+          </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-3">
-        <div className="xl:col-span-2">
-          <RecentClientsList />
-        </div>
-        <ActivityFeed />
-      </div>
+          <div className="mt-8 grid gap-6 xl:grid-cols-2">
+            <RevenueChartAnimated data={data.revenueByMonth} />
+            <LeadsChartAnimated data={data.leadsByMonth} />
+          </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <UpcomingEvents />
-        <TasksWidget />
-      </div>
+          <div className="mt-6 grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <PipelineChart data={data.pipeline} />
+            </div>
+            <EventTypeChart data={data.eventTypeBreakdown} />
+          </div>
+
+          <div className="mt-6 grid gap-6 xl:grid-cols-3">
+            <div className="xl:col-span-2">
+              <RecentClientsList clients={data.recentClients} />
+            </div>
+            <ActivityFeed activities={data.activities} />
+          </div>
+
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+            <UpcomingEvents events={data.upcomingEvents} />
+            <TasksWidget tasks={data.tasks} />
+          </div>
+        </>
+      )}
     </>
   );
 }

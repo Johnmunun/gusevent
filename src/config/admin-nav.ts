@@ -14,8 +14,15 @@ import {
   Shield,
   UserCog,
   Layout,
+  MessageSquare,
 } from "lucide-react";
 import { PERMISSIONS, type Permission } from "@/lib/auth/permissions";
+
+export type DynamicBadgeKey =
+  | "clients"
+  | "pendingQuotes"
+  | "pipeline"
+  | "tasks";
 
 export type AdminNavItem = {
   label: string;
@@ -23,6 +30,7 @@ export type AdminNavItem = {
   icon: typeof LayoutDashboard;
   exact?: boolean;
   badge?: string;
+  dynamicBadge?: DynamicBadgeKey;
   permission?: Permission;
 };
 
@@ -68,20 +76,27 @@ export const adminNavGroups: AdminNavGroup[] = [
         label: "Clients",
         href: "/admin/clients",
         icon: Users,
-        badge: "12",
+        dynamicBadge: "clients",
         permission: PERMISSIONS.clients,
       },
       {
         label: "Pipeline ventes",
         href: "/admin/pipeline",
         icon: Kanban,
+        dynamicBadge: "pipeline",
         permission: PERMISSIONS.pipeline,
       },
       {
         label: "Demandes devis",
         href: "/admin/devis",
         icon: FileText,
-        badge: "4",
+        dynamicBadge: "pendingQuotes",
+        permission: PERMISSIONS.devis,
+      },
+      {
+        label: "Témoignages clients",
+        href: "/admin/temoignages",
+        icon: MessageSquare,
         permission: PERMISSIONS.devis,
       },
     ],
@@ -105,7 +120,7 @@ export const adminNavGroups: AdminNavGroup[] = [
         label: "Tâches équipe",
         href: "/admin/taches",
         icon: CheckSquare,
-        badge: "6",
+        dynamicBadge: "tasks",
         permission: PERMISSIONS.tasks,
       },
     ],

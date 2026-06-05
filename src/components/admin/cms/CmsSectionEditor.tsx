@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { CmsImageField } from "@/components/admin/cms/CmsImageField";
+import { GalleryCmsEditor } from "@/components/admin/cms/GalleryCmsEditor";
 import {
   CmsFormField,
   cmsInputClass,
@@ -39,7 +40,11 @@ export function CmsSectionEditor({ slug }: CmsSectionEditorProps) {
       body: JSON.stringify({ content }),
     });
     setSaving(false);
-    setMessage(res.ok ? "Enregistré." : "Erreur lors de l'enregistrement.");
+    setMessage(
+      res.ok
+        ? "Enregistré — la page d'accueil est mise à jour (rafraîchissez / si besoin)."
+        : "Erreur lors de l'enregistrement."
+    );
   }
 
   if (loading || content === null) {
@@ -48,6 +53,18 @@ export function CmsSectionEditor({ slug }: CmsSectionEditorProps) {
         <Loader2 className="h-5 w-5 animate-spin" />
         Chargement…
       </div>
+    );
+  }
+
+  if (slug === "gallery") {
+    return (
+      <GalleryCmsEditor
+        content={content as Record<string, unknown>}
+        setContent={setContent}
+        onSave={save}
+        saving={saving}
+        message={message}
+      />
     );
   }
 
@@ -83,9 +100,6 @@ export function CmsSectionEditor({ slug }: CmsSectionEditorProps) {
       )}
       {slug === "services" && (
         <ServicesEditor content={content as Record<string, unknown>} setContent={setContent} />
-      )}
-      {slug === "gallery" && (
-        <GalleryEditor content={content as Record<string, unknown>} setContent={setContent} />
       )}
       {slug === "testimonials" && (
         <TestimonialsEditor content={content as Record<string, unknown>} setContent={setContent} />
@@ -139,7 +153,16 @@ function HeroEditor({
       <CmsImageField
         label="Image de fond"
         value={String(content.backgroundImage ?? "")}
-        onChange={(url) => set("backgroundImage", url)}
+        onChange={(url) => {
+          const patch: Record<string, unknown> = {
+            ...content,
+            backgroundImage: url,
+          };
+          if (url.startsWith("http://") || url.startsWith("https://")) {
+            patch.backgroundImageFallbacks = [url];
+          }
+          setContent(patch);
+        }}
       />
     </div>
   );
@@ -282,48 +305,6 @@ function ServicesEditor({
   );
 }
 
-function GalleryEditor({
-  content,
-  setContent,
-}: {
-  content: Record<string, unknown>;
-  setContent: (c: unknown) => void;
-}) {
-  const heading = (content.heading ?? {}) as Record<string, string>;
-  const items = (content.items ?? []) as Array<Record<string, unknown>>;
-
-  return (
-    <div className="admin-card space-y-6 bg-surface p-6">
-      <HeadingFields heading={heading} onChange={(h) => setContent({ ...content, heading: h })} />
-      {items.map((item, i) => (
-        <div key={String(item.id ?? i)} className="space-y-3 border-t border-border pt-5">
-          <p className="text-sm font-medium">Projet {i + 1}</p>
-          <CmsFormField label="Titre">
-            <input
-              className={cmsInputClass}
-              value={String(item.title ?? "")}
-              onChange={(e) => {
-                const next = [...items];
-                next[i] = { ...item, title: e.target.value };
-                setContent({ ...content, items: next });
-              }}
-            />
-          </CmsFormField>
-          <CmsImageField
-            label="Image"
-            value={String(item.image ?? "")}
-            onChange={(url) => {
-              const next = [...items];
-              next[i] = { ...item, image: url };
-              setContent({ ...content, items: next });
-            }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function TestimonialsEditor({
   content,
   setContent,
@@ -369,7 +350,13 @@ function TestimonialsEditor({
             value={String(item.image ?? "")}
             onChange={(url) => {
               const next = [...items];
-              next[i] = { ...item, image: url };
+              next[i] = {
+                ...item,
+                image: url,
+                ...(url.startsWith("http://") || url.startsWith("https://")
+                  ? { fallback: url }
+                  : {}),
+              };
               setContent({ ...content, items: next });
             }}
           />

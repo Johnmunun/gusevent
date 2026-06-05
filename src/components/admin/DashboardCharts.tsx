@@ -2,20 +2,25 @@
 
 import { motion } from "framer-motion";
 import { AdminCard } from "@/components/admin/AdminCard";
-import {
-  pipelineColumns,
-  revenueByMonth,
-  leadsByMonth,
-  eventTypeBreakdown,
-} from "@/data/admin-mock";
+import type {
+  DashboardEventTypeRow,
+  DashboardLeadPoint,
+  DashboardMonthPoint,
+  DashboardPipelineRow,
+} from "@/lib/dashboard/service";
+import type { ConversionMonthPoint } from "@/lib/growth/service";
 
-export function RevenueChartAnimated() {
-  const max = Math.max(...revenueByMonth.map((m) => m.amount));
+type RevenueChartProps = {
+  data: DashboardMonthPoint[];
+};
+
+export function RevenueChartAnimated({ data }: RevenueChartProps) {
+  const max = Math.max(1, ...data.map((m) => m.amount));
 
   return (
     <AdminCard title="Revenus prévisionnels (6 mois)">
       <div className="flex h-44 items-end justify-between gap-2 sm:h-52">
-        {revenueByMonth.map((item, i) => (
+        {data.map((item, i) => (
           <div
             key={item.month}
             className="group/bar flex flex-1 flex-col items-center gap-2"
@@ -24,7 +29,11 @@ export function RevenueChartAnimated() {
               initial={{ height: 0 }}
               whileInView={{ height: `${(item.amount / max) * 100}%` }}
               viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              transition={{
+                duration: 0.7,
+                delay: i * 0.08,
+                ease: [0.22, 1, 0.36, 1],
+              }}
               whileHover={{ scale: 1.05 }}
               className="w-full max-w-[2.75rem] min-h-[8px] origin-bottom bg-gradient-to-t from-gold-dark via-gold to-amber-200 shadow-sm transition-shadow group-hover/bar:shadow-md"
               title={`${item.amount} k DT`}
@@ -35,15 +44,23 @@ export function RevenueChartAnimated() {
           </div>
         ))}
       </div>
+      <p className="mt-4 text-xs text-muted">
+        Estimation à partir des budgets des dossiers confirmés.
+      </p>
     </AdminCard>
   );
 }
 
-export function LeadsChartAnimated() {
-  const max = Math.max(...leadsByMonth.map((m) => m.count));
-  const points = leadsByMonth
+type LeadsChartProps = {
+  data: DashboardLeadPoint[];
+};
+
+export function LeadsChartAnimated({ data }: LeadsChartProps) {
+  const max = Math.max(1, ...data.map((m) => m.count));
+  const denom = Math.max(1, data.length - 1);
+  const points = data
     .map((m, i) => {
-      const x = (i / (leadsByMonth.length - 1)) * 100;
+      const x = (i / denom) * 100;
       const y = 100 - (m.count / max) * 80;
       return `${x},${y}`;
     })
@@ -84,7 +101,7 @@ export function LeadsChartAnimated() {
           />
         </svg>
         <div className="mt-3 flex justify-between text-[10px] text-muted">
-          {leadsByMonth.map((m) => (
+          {data.map((m) => (
             <span key={m.month}>{m.month}</span>
           ))}
         </div>
@@ -93,20 +110,24 @@ export function LeadsChartAnimated() {
   );
 }
 
-export function PipelineChart() {
-  const total = pipelineColumns.reduce((s, c) => s + c.clients.length, 0);
+type PipelineChartProps = {
+  data: DashboardPipelineRow[];
+};
+
+export function PipelineChart({ data }: PipelineChartProps) {
+  const total = data.reduce((s, c) => s + c.count, 0);
 
   return (
     <AdminCard title="Pipeline commercial">
       <div className="space-y-4">
-        {pipelineColumns.map((col, i) => {
-          const pct = total ? Math.round((col.clients.length / total) * 100) : 0;
+        {data.map((col, i) => {
+          const pct = total ? Math.round((col.count / total) * 100) : 0;
           return (
             <div key={col.id}>
               <div className="mb-1.5 flex justify-between text-sm">
                 <span className="text-foreground">{col.title}</span>
                 <span className="text-muted">
-                  {col.clients.length} · {pct}%
+                  {col.count} · {pct}%
                 </span>
               </div>
               <div className="h-2 overflow-hidden bg-stone-100">
@@ -126,19 +147,75 @@ export function PipelineChart() {
   );
 }
 
-export function EventTypeChart() {
+type EventTypeChartProps = {
+  data: DashboardEventTypeRow[];
+};
+
+const PIE_COLORS = [
+  "rgb(201 169 98)",
+  "rgb(154 123 60)",
+  "rgb(107 88 45)",
+  "rgb(60 55 50)",
+];
+
+type ConversionChartProps = {
+  data: ConversionMonthPoint[];
+};
+
+export function ConversionChartAnimated({ data }: ConversionChartProps) {
+  const max = Math.max(1, ...data.map((m) => m.rate));
+
+  return (
+    <AdminCard title="Taux de conversion / mois">
+      <div className="flex h-44 items-end justify-between gap-2 sm:h-52">
+        {data.map((item, i) => (
+          <div
+            key={item.month}
+            className="group/bar flex flex-1 flex-col items-center gap-2"
+          >
+            <motion.div
+              initial={{ height: 0 }}
+              whileInView={{ height: `${(item.rate / max) * 100}%` }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.7,
+                delay: i * 0.08,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              whileHover={{ scale: 1.05 }}
+              className="w-full max-w-[2.75rem] min-h-[8px] origin-bottom bg-gradient-to-t from-emerald-700 via-emerald-500 to-emerald-300 shadow-sm transition-shadow group-hover/bar:shadow-md"
+              title={`${item.rate} % (${item.converted}/${item.leads})`}
+            />
+            <span className="text-[10px] font-medium text-muted group-hover/bar:text-foreground">
+              {item.month}
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="mt-4 text-xs text-muted">
+        Part des demandes du mois devenues confirmées ou terminées.
+      </p>
+    </AdminCard>
+  );
+}
+
+export function EventTypeChart({ data }: EventTypeChartProps) {
+  let cursor = 0;
+  const stops = data
+    .map((row, i) => {
+      const start = cursor;
+      cursor += row.pct;
+      return `${PIE_COLORS[i % PIE_COLORS.length]} ${start}% ${cursor}%`;
+    })
+    .join(", ");
+
   return (
     <AdminCard title="Répartition par type">
       <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
         <div
           className="relative h-36 w-36 shrink-0 rounded-full"
           style={{
-            background: `conic-gradient(
-              rgb(201 169 98) 0% ${eventTypeBreakdown[0].pct}%,
-              rgb(154 123 60) ${eventTypeBreakdown[0].pct}% ${eventTypeBreakdown[0].pct + eventTypeBreakdown[1].pct}%,
-              rgb(107 88 45) ${eventTypeBreakdown[0].pct + eventTypeBreakdown[1].pct}% ${eventTypeBreakdown[0].pct + eventTypeBreakdown[1].pct + eventTypeBreakdown[2].pct}%,
-              rgb(60 55 50) ${eventTypeBreakdown[0].pct + eventTypeBreakdown[1].pct + eventTypeBreakdown[2].pct}% 100%
-            )`,
+            background: `conic-gradient(${stops})`,
           }}
         >
           <div className="absolute inset-4 flex items-center justify-center rounded-full bg-surface">
@@ -146,7 +223,7 @@ export function EventTypeChart() {
           </div>
         </div>
         <ul className="w-full space-y-3">
-          {eventTypeBreakdown.map((row, i) => (
+          {data.map((row, i) => (
             <motion.li
               key={row.type}
               initial={{ opacity: 0, x: 8 }}
@@ -159,14 +236,7 @@ export function EventTypeChart() {
                 <span
                   className="h-2 w-2 shrink-0"
                   style={{
-                    backgroundColor:
-                      i === 0
-                        ? "rgb(201 169 98)"
-                        : i === 1
-                          ? "rgb(154 123 60)"
-                          : i === 2
-                            ? "rgb(107 88 45)"
-                            : "rgb(60 55 50)",
+                    backgroundColor: PIE_COLORS[i % PIE_COLORS.length],
                   }}
                 />
                 {row.type}

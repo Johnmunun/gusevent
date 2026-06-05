@@ -5,8 +5,12 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { DevisButton } from "@/components/ui/DevisButton";
-import { Logo } from "@/components/ui/Logo";
+import { Logo, type LogoBranding } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
+
+type HeaderProps = {
+  branding?: LogoBranding;
+};
 
 const navLinks = [
   { label: "Services", href: "/#services" },
@@ -16,7 +20,7 @@ const navLinks = [
   { label: "Devis", href: "/devis" },
 ];
 
-export function Header() {
+export function Header({ branding }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [onHero, setOnHero] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,33 +38,42 @@ export function Header() {
 
   const lightNav = !onHero || scrolled;
 
+  const linkClass = cn(
+    "relative py-1 text-[0.8125rem] font-medium tracking-wide transition-colors duration-300",
+    "after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-gold after:transition-transform after:duration-300 hover:after:scale-x-100",
+    lightNav
+      ? "text-muted hover:text-foreground"
+      : "text-white/80 hover:text-white"
+  );
+
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-500",
-        scrolled && "border-b border-border/60 bg-cream/90 backdrop-blur-xl"
+        scrolled
+          ? "border-b border-border/50 bg-cream/92 shadow-[0_1px_0_rgba(201,169,98,0.12),0_8px_24px_-8px_rgba(28,25,23,0.08)] backdrop-blur-xl"
+          : onHero
+            ? "bg-gradient-to-b from-ink/35 via-ink/10 to-transparent backdrop-blur-[2px]"
+            : "border-b border-border/40 bg-cream/80 backdrop-blur-md"
       )}
     >
-      <div className="mx-auto flex h-14 min-h-14 w-full max-w-[82rem] items-center justify-between px-4 sm:h-[4.5rem] sm:px-6 lg:px-12 xl:px-16">
-        <Logo variant={lightNav ? "dark" : "light"} showText />
+      <div className="mx-auto flex h-14 min-h-14 w-full max-w-[82rem] items-center justify-between gap-4 px-4 sm:h-[4.5rem] sm:px-6 lg:px-12 xl:px-16">
+        <Logo
+          variant={lightNav ? "dark" : "light"}
+          branding={branding}
+        />
 
-        <ul className="hidden items-center gap-10 md:flex">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className={cn(
-                  "text-sm tracking-wide transition-colors",
-                  lightNav
-                    ? "text-muted hover:text-foreground"
-                    : "text-white/75 hover:text-gold"
-                )}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <nav className="hidden md:block" aria-label="Navigation principale">
+          <ul className="flex items-center gap-8 lg:gap-9">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className={linkClass}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         <div className="hidden md:block">
           <DevisButton size="md" />
@@ -69,11 +82,14 @@ export function Header() {
         <button
           type="button"
           className={cn(
-            "p-2 md:hidden",
-            lightNav ? "text-foreground" : "text-white"
+            "rounded-lg p-2 transition-colors md:hidden",
+            lightNav
+              ? "text-foreground hover:bg-surface"
+              : "text-white hover:bg-white/10"
           )}
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "Fermer" : "Menu"}
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -85,21 +101,21 @@ export function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-t border-border bg-cream md:hidden"
+            className="overflow-hidden border-t border-border/80 bg-cream/98 backdrop-blur-lg md:hidden"
           >
-            <ul className="flex flex-col gap-1 px-5 py-4">
+            <ul className="flex flex-col px-4 py-3">
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="block py-3 text-foreground"
+                    className="block border-b border-border/50 py-3.5 text-sm font-medium text-foreground transition-colors last:border-b-0 hover:text-gold"
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
-              <li className="pt-2">
+              <li className="pt-4 pb-1">
                 <DevisButton size="md" className="w-full" />
               </li>
             </ul>

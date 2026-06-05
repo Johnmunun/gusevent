@@ -13,6 +13,12 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Les routes API admin gèrent l'auth dans requireApiPermission (évite les
+  // blocages PATCH/PUT par le middleware Neon en edge runtime).
+  if (pathname.startsWith("/api/admin")) {
+    return NextResponse.next();
+  }
+
   if (
     pathname === "/admin/login" ||
     pathname === "/admin/unauthorized" ||

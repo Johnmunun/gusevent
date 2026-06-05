@@ -16,10 +16,15 @@ export default async function AdminCmsSectionPage({ params }: Props) {
 
   const sectionSlug = slug as CmsSlug;
 
+  const description =
+    sectionSlug === "gallery"
+      ? "Gérez les visuels de la section Réalisations sur la page d'accueil."
+      : "Éditeur de contenu pour la landing page.";
+
   return (
     <AdminShell
       title={CMS_SECTION_LABELS[sectionSlug]}
-      description="Éditeur de contenu pour la landing page."
+      description={description}
     >
       <Link
         href="/admin/cms"

@@ -1,6 +1,7 @@
 "use client";
 
-import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { LogOut, Menu, Search } from "lucide-react";
+import { AdminNotifications } from "@/components/admin/AdminNotifications";
 import { authClient } from "@/lib/auth/client";
 import { ROLE_LABELS } from "@/lib/auth/permissions";
 import { useAdminApp } from "@/components/admin/admin-app-context";
@@ -54,14 +55,7 @@ export function AdminTopbar({
               aria-label="Recherche"
             />
           </div>
-          <button
-            type="button"
-            className="relative flex h-10 w-10 items-center justify-center border border-border bg-surface text-muted hover:text-gold"
-            aria-label="Notifications"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-gold" />
-          </button>
+          <AdminNotifications />
           <div className="hidden items-center gap-3 border-l border-border pl-4 sm:flex">
             <div className="flex h-10 w-10 items-center justify-center bg-ink font-display text-sm text-gold">
               {initial}

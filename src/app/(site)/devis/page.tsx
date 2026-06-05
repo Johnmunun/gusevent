@@ -29,6 +29,12 @@ export default function DevisPage() {
             Remplissez le formulaire dans le panneau latéral. L&apos;équipe{" "}
             {brand.name} vous répond sous 24 heures.
           </p>
+          <Link
+            href="/devis/modifier"
+            className="mt-4 inline-block text-sm text-stone-400 underline-offset-4 transition-colors hover:text-gold hover:underline"
+          >
+            Déjà une demande ? Modifier budget ou détails
+          </Link>
           <button
             type="button"
             onClick={open}

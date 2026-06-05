@@ -4,10 +4,35 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
+function createPrismaClient() {
+  return new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+/** Délégations requises — détecte un client Prisma obsolète après `prisma generate`. */
+const REQUIRED_DELEGATES = ["testimonialSubmission"] as const;
+
+function isStaleClient(client: PrismaClient) {
+  return REQUIRED_DELEGATES.some(
+    (key) => !(key in client)
+  );
+}
+
+function getPrismaClient() {
+  const cached = globalForPrisma.prisma;
+
+  if (cached && !isStaleClient(cached)) {
+    return cached;
+  }
+
+  if (cached) {
+    void cached.$disconnect();
+  }
+
+  const client = createPrismaClient();
+  globalForPrisma.prisma = client;
+  return client;
+}
+
+export const prisma = getPrismaClient();

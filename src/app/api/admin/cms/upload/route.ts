@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import { requireApiPermission } from "@/lib/auth/api-guard";
 import { PERMISSIONS } from "@/lib/auth/permissions";
+import { uploadImageBuffer } from "@/lib/cloudinary/upload";
+import { isCloudinaryConfigured } from "@/lib/cloudinary/utils";
+import { saveLocalCmsImage } from "@/lib/cloudinary/local-upload";
 
-const MAX_SIZE = 5 * 1024 * 1024;
+const MAX_SIZE = 10 * 1024 * 1024;
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export async function POST(request: Request) {
@@ -23,17 +24,29 @@ export async function POST(request: Request) {
   }
 
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "Fichier trop volumineux (max 5 Mo)" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Fichier trop volumineux (max 10 Mo)" },
+      { status: 400 }
+    );
   }
 
-  const ext = file.type.split("/")[1]?.replace("jpeg", "jpg") ?? "jpg";
-  const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const dir = path.join(process.cwd(), "public", "uploads", "cms");
-  await mkdir(dir, { recursive: true });
-
   const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(dir, name), buffer);
 
-  const url = `/uploads/cms/${name}`;
-  return NextResponse.json({ url });
+  try {
+    if (isCloudinaryConfigured()) {
+      const result = await uploadImageBuffer(buffer);
+      return NextResponse.json({
+        url: result.url,
+        publicId: result.publicId,
+        provider: "cloudinary",
+      });
+    }
+
+    const url = await saveLocalCmsImage(buffer, file.type);
+    return NextResponse.json({ url, provider: "local" });
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Échec du téléversement";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }

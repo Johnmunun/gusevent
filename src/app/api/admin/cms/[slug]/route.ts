@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { requireApiPermission } from "@/lib/auth/api-guard";
 import { PERMISSIONS } from "@/lib/auth/permissions";
@@ -47,5 +48,8 @@ export async function PUT(
 
   await saveCmsSection(slug, content, guard.session?.user?.id);
 
-  return NextResponse.json({ ok: true, slug });
+  revalidatePath("/", "layout");
+  revalidatePath("/");
+
+  return NextResponse.json({ ok: true, slug, revalidated: true });
 }
