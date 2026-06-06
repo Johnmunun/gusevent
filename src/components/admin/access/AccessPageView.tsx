@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2, Shield, Users } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS, getRoleCardIcon } from "@/lib/admin/card-icons";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import type { SystemAccessData } from "@/lib/system/service";
 
@@ -75,7 +76,7 @@ export function AccessPageView() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {data.roles.map((role) => (
-          <AdminCard key={role.role} title={role.label}>
+          <AdminCard key={role.role} title={role.label} icon={getRoleCardIcon(role.role)}>
             <p className="text-sm leading-relaxed text-muted">
               {role.description}
             </p>

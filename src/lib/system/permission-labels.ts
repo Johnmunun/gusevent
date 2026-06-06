@@ -16,4 +16,6 @@ export const PERMISSION_LABELS: Record<string, string> = {
   [PERMISSIONS.marketing]: "Marketing",
   [PERMISSIONS.users]: "Utilisateurs & accès",
   [PERMISSIONS.settings]: "Paramètres",
+  [PERMISSIONS.hr]: "RH (lecture)",
+  [PERMISSIONS.hrEdit]: "RH (édition)",
 };

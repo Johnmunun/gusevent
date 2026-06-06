@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import type {
   DashboardEventTypeRow,
   DashboardLeadPoint,
@@ -18,7 +19,7 @@ export function RevenueChartAnimated({ data }: RevenueChartProps) {
   const max = Math.max(1, ...data.map((m) => m.amount));
 
   return (
-    <AdminCard title="Revenus prévisionnels (6 mois)">
+    <AdminCard title="Revenus prévisionnels (6 mois)" icon={ADMIN_CARD_ICONS.revenue}>
       <div className="flex h-44 items-end justify-between gap-2 sm:h-52">
         {data.map((item, i) => (
           <div
@@ -67,7 +68,7 @@ export function LeadsChartAnimated({ data }: LeadsChartProps) {
     .join(" ");
 
   return (
-    <AdminCard title="Demandes de devis / mois">
+    <AdminCard title="Demandes de devis / mois" icon={ADMIN_CARD_ICONS.leads}>
       <div className="relative h-44 sm:h-48">
         <svg
           viewBox="0 0 100 100"
@@ -118,7 +119,7 @@ export function PipelineChart({ data }: PipelineChartProps) {
   const total = data.reduce((s, c) => s + c.count, 0);
 
   return (
-    <AdminCard title="Pipeline commercial">
+    <AdminCard title="Pipeline commercial" icon={ADMIN_CARD_ICONS.pipeline}>
       <div className="space-y-4">
         {data.map((col, i) => {
           const pct = total ? Math.round((col.count / total) * 100) : 0;
@@ -166,7 +167,7 @@ export function ConversionChartAnimated({ data }: ConversionChartProps) {
   const max = Math.max(1, ...data.map((m) => m.rate));
 
   return (
-    <AdminCard title="Taux de conversion / mois">
+    <AdminCard title="Taux de conversion / mois" icon={ADMIN_CARD_ICONS.conversion}>
       <div className="flex h-44 items-end justify-between gap-2 sm:h-52">
         {data.map((item, i) => (
           <div
@@ -210,7 +211,7 @@ export function EventTypeChart({ data }: EventTypeChartProps) {
     .join(", ");
 
   return (
-    <AdminCard title="Répartition par type">
+    <AdminCard title="Répartition par type" icon={ADMIN_CARD_ICONS.eventTypes}>
       <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
         <div
           className="relative h-36 w-36 shrink-0 rounded-full"

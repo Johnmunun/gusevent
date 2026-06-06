@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Circle, Loader2 } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import type { ProductionTask } from "@/lib/production/service";
 
 export function TasksPageView() {
@@ -32,7 +33,7 @@ export function TasksPageView() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
-      <AdminCard title={`À faire (${pending.length})`}>
+      <AdminCard title={`À faire (${pending.length})`} icon={ADMIN_CARD_ICONS.tasksPending}>
         {pending.length === 0 ? (
           <p className="text-sm text-muted">
             Aucune tâche en attente — tout est à jour.
@@ -62,7 +63,7 @@ export function TasksPageView() {
           </ul>
         )}
       </AdminCard>
-      <AdminCard title={`Terminées (${done.length})`}>
+      <AdminCard title={`Terminées (${done.length})`} icon={ADMIN_CARD_ICONS.tasksDone}>
         {done.length === 0 ? (
           <p className="text-sm text-muted">Aucun dossier clôturé pour le moment.</p>
         ) : (

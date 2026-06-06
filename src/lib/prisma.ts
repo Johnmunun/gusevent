@@ -11,7 +11,7 @@ function createPrismaClient() {
 }
 
 /** Délégations requises — détecte un client Prisma obsolète après `prisma generate`. */
-const REQUIRED_DELEGATES = ["testimonialSubmission"] as const;
+const REQUIRED_DELEGATES = ["testimonialSubmission", "employee", "payslip"] as const;
 
 function isStaleClient(client: PrismaClient) {
   return REQUIRED_DELEGATES.some(

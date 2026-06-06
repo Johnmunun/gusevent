@@ -1,6 +1,16 @@
 import Link from "next/link";
-import { ArrowRight, Calendar, CheckCircle2, Circle } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Bell,
+  Calendar,
+  CheckCircle2,
+  Circle,
+  FileText,
+} from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { AdminCardIcon } from "@/components/admin/AdminCardIcon";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import {
   clientStatusLabels,
   clientStatusStyles,
@@ -20,6 +30,7 @@ export function UpcomingEvents({ events }: UpcomingEventsProps) {
   return (
     <AdminCard
       title="Événements à venir"
+      icon={ADMIN_CARD_ICONS.upcomingEvents}
       action={
         <Link
           href="/admin/calendrier"
@@ -66,6 +77,7 @@ export function TasksWidget({ tasks }: TasksWidgetProps) {
   return (
     <AdminCard
       title="Tâches du jour"
+      icon={ADMIN_CARD_ICONS.tasks}
       action={
         <Link href="/admin/taches" className="text-sm text-gold hover:underline">
           Tout voir
@@ -109,32 +121,38 @@ type ActivityFeedProps = {
   activities: DashboardActivity[];
 };
 
+function getActivityIcon(type: DashboardActivity["type"]) {
+  switch (type) {
+    case "success":
+      return CheckCircle2;
+    case "alert":
+      return AlertTriangle;
+    case "devis":
+      return FileText;
+    default:
+      return Bell;
+  }
+}
+
 export function ActivityFeed({ activities }: ActivityFeedProps) {
   return (
-    <AdminCard title="Activité récente">
+    <AdminCard title="Activité récente" icon={ADMIN_CARD_ICONS.activity}>
       {activities.length === 0 ? (
         <p className="text-sm text-muted">Aucune activité récente.</p>
       ) : (
         <ul className="space-y-4">
-          {activities.map((a) => (
+          {activities.map((a) => {
+            const ActivityIcon = getActivityIcon(a.type);
+            return (
             <li key={a.id} className="flex gap-3">
-              <span
-                className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                  a.type === "success"
-                    ? "bg-emerald-500"
-                    : a.type === "alert"
-                      ? "bg-amber-500"
-                      : a.type === "devis"
-                        ? "bg-gold"
-                        : "bg-stone-400"
-                }`}
-              />
+              <AdminCardIcon icon={ActivityIcon} size="sm" className="mt-0.5" />
               <div>
                 <p className="text-sm text-foreground">{a.text}</p>
                 <p className="text-xs text-muted">{a.time}</p>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </AdminCard>
@@ -149,6 +167,7 @@ export function RecentClientsList({ clients }: RecentClientsListProps) {
   return (
     <AdminCard
       title="Clients récents"
+      icon={ADMIN_CARD_ICONS.recentClients}
       action={
         <Link
           href="/admin/clients"

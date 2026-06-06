@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingDown, TrendingUp, Minus } from "lucide-react";
+import { TrendingDown, TrendingUp, Minus, type LucideIcon } from "lucide-react";
+import { AdminCardIcon } from "@/components/admin/AdminCardIcon";
+import { getStatCardIcon } from "@/lib/admin/card-icons";
 import { cn } from "@/lib/utils";
 
 type AdminStatCardProps = {
@@ -11,6 +13,7 @@ type AdminStatCardProps = {
   hint?: string;
   trend?: "up" | "down" | "neutral";
   index?: number;
+  icon?: LucideIcon;
 };
 
 export function AdminStatCard({
@@ -20,9 +23,11 @@ export function AdminStatCard({
   hint,
   trend = "neutral",
   index = 0,
+  icon,
 }: AdminStatCardProps) {
   const TrendIcon =
     trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
+  const StatIcon = icon ?? getStatCardIcon(label);
 
   return (
     <motion.div
@@ -39,9 +44,12 @@ export function AdminStatCard({
     >
       <div className="absolute top-0 right-0 h-28 w-28 translate-x-10 -translate-y-10 bg-gold/15 blur-2xl transition-all duration-500 group-hover:bg-gold/25" />
       <div className="absolute bottom-0 left-0 h-0.5 w-0 bg-gold transition-all duration-500 group-hover:w-full" />
-      <p className="text-[10px] font-semibold tracking-[0.15em] text-muted uppercase">
-        {label}
-      </p>
+      <div className="relative flex items-start justify-between gap-3">
+        <p className="text-[10px] font-semibold tracking-[0.15em] text-muted uppercase">
+          {label}
+        </p>
+        <AdminCardIcon icon={StatIcon} size="sm" />
+      </div>
       <p className="relative mt-2 font-display text-3xl font-medium text-foreground sm:text-4xl">
         {value}
         {suffix && (

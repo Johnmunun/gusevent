@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { QuoteRequestStatus } from "@prisma/client";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import { PIPELINE_STATUS_LABELS } from "@/lib/pipeline/config";
 import type {
   ProductionCalendar,
@@ -261,7 +262,7 @@ export function CalendarPageView() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <AdminCard title="Vue mensuelle" hover={false} className="overflow-hidden">
+        <AdminCard title="Vue mensuelle" icon={ADMIN_CARD_ICONS.calendar} hover={false} className="overflow-hidden">
           {loading ? (
             <p className="flex items-center gap-2 py-16 text-sm text-muted">
               <Loader2 className="h-4 w-4 animate-spin" />

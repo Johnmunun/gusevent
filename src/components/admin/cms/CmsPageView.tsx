@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Layout, Loader2 } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { AdminCardIcon } from "@/components/admin/AdminCardIcon";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
+import { getCmsSectionIcon } from "@/lib/admin/card-icons";
 import type { CmsOverviewData } from "@/lib/site/service";
 
 function formatDate(iso: string | null): string {
@@ -88,7 +90,9 @@ export function CmsPageView() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {data.sections.map((section) => (
+        {data.sections.map((section) => {
+          const SectionIcon = getCmsSectionIcon(section.slug);
+          return (
           <Link
             key={section.slug}
             href={`/admin/cms/${section.slug}`}
@@ -97,7 +101,7 @@ export function CmsPageView() {
             <AdminCard hover className="h-full transition-all group-hover:border-gold/40">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <Layout className="mb-3 h-5 w-5 text-gold" />
+                  <AdminCardIcon icon={SectionIcon} className="mb-3" />
                   <h3 className="font-display text-lg text-foreground">
                     {section.label}
                   </h3>
@@ -124,7 +128,8 @@ export function CmsPageView() {
               </div>
             </AdminCard>
           </Link>
-        ))}
+          );
+        })}
       </div>
     </>
   );

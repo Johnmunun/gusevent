@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import type { MarketingData } from "@/lib/growth/service";
 
@@ -122,7 +123,7 @@ export function MarketingPageView() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <AdminCard title="Idées de contenu">
+        <AdminCard title="Idées de contenu" icon={ADMIN_CARD_ICONS.contentIdeas}>
           <ul className="space-y-3 text-sm">
             {contentIdeas.map((idea) => (
               <li key={idea.id} className="flex items-start gap-2">
@@ -148,6 +149,7 @@ export function MarketingPageView() {
 
         <AdminCard
           title="Leads à relancer"
+          icon={ADMIN_CARD_ICONS.nurtureLeads}
           action={
             <Link
               href="/admin/devis"

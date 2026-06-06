@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import { EmailSettingsForm } from "@/components/admin/settings/EmailSettingsForm";
 import { ContactSettingsForm } from "@/components/admin/settings/ContactSettingsForm";
+import { HrPayrollSettingsForm } from "@/components/admin/settings/HrPayrollSettingsForm";
 import { LogoSettingsForm } from "@/components/admin/settings/LogoSettingsForm";
 import type { SystemSettingsData } from "@/lib/system/service";
 
@@ -67,16 +69,25 @@ export function SettingsPageView() {
     <div className="grid gap-6 lg:grid-cols-2">
       <AdminCard
         title="Logo du site"
+        icon={ADMIN_CARD_ICONS.logo}
         className="lg:col-span-2"
       >
         <LogoSettingsForm />
       </AdminCard>
 
-      <AdminCard title="Contact & réseaux" className="lg:col-span-2">
+      <AdminCard title="Contact & réseaux" icon={ADMIN_CARD_ICONS.contact} className="lg:col-span-2">
         <ContactSettingsForm />
       </AdminCard>
 
-      <AdminCard title="Identité">
+      <AdminCard
+        title="RH — Paie & devises"
+        icon={ADMIN_CARD_ICONS.hrPayroll}
+        className="lg:col-span-2"
+      >
+        <HrPayrollSettingsForm />
+      </AdminCard>
+
+      <AdminCard title="Identité" icon={ADMIN_CARD_ICONS.identity}>
         <dl className="space-y-4 text-sm">
           <div>
             <dt className="text-muted">Nom</dt>
@@ -95,7 +106,7 @@ export function SettingsPageView() {
         </dl>
       </AdminCard>
 
-      <AdminCard title="Contact public">
+      <AdminCard title="Contact public" icon={ADMIN_CARD_ICONS.contactPublic}>
         <dl className="space-y-4 text-sm">
           <div>
             <dt className="text-muted">Email</dt>
@@ -123,7 +134,7 @@ export function SettingsPageView() {
         </p>
       </AdminCard>
 
-      <AdminCard title="État du système" className="lg:col-span-2">
+      <AdminCard title="État du système" icon={ADMIN_CARD_ICONS.system} className="lg:col-span-2">
         <ul className="grid gap-4 sm:grid-cols-2">
           <StatusRow
             ok={data.security.neonAuthConfigured}
@@ -185,12 +196,13 @@ export function SettingsPageView() {
 
       <AdminCard
         title="Emails — devis & notifications"
+        icon={ADMIN_CARD_ICONS.email}
         className="lg:col-span-2"
       >
         <EmailSettingsForm />
       </AdminCard>
 
-      <AdminCard title="Sécurité" className="lg:col-span-2">
+      <AdminCard title="Sécurité" icon={ADMIN_CARD_ICONS.security} className="lg:col-span-2">
         <p className="text-sm leading-relaxed text-muted">
           Authentification via <strong>Neon Auth</strong>. Les comptes panneau
           sont créés par un administrateur dans{" "}

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Loader2, Plus, Pencil, Trash2, UserCog } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import {
   UserFormDrawer,
@@ -117,7 +118,7 @@ export function UsersManager() {
         </div>
       )}
 
-      <AdminCard title="Comptes" noPadding>
+      <AdminCard title="Comptes" icon={ADMIN_CARD_ICONS.accounts} noPadding>
         {loading ? (
           <p className="flex items-center gap-2 p-6 text-sm text-muted">
             <Loader2 className="h-4 w-4 animate-spin" />

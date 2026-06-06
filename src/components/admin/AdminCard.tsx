@@ -1,10 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { LucideIcon } from "lucide-react";
+import { AdminCardIcon } from "@/components/admin/AdminCardIcon";
 import { cn } from "@/lib/utils";
 
 type AdminCardProps = {
   title?: string;
+  icon?: LucideIcon;
   action?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
@@ -14,6 +17,7 @@ type AdminCardProps = {
 
 export function AdminCard({
   title,
+  icon,
   action,
   children,
   className,
@@ -44,9 +48,12 @@ export function AdminCard({
     >
       {title && (
         <div className="flex items-center justify-between border-b border-border/80 px-5 py-4 sm:px-6">
-          <h2 className="font-display text-lg font-medium text-foreground">
-            {title}
-          </h2>
+          <div className="flex min-w-0 items-center gap-3">
+            {icon ? <AdminCardIcon icon={icon} /> : null}
+            <h2 className="font-display text-lg font-medium text-foreground">
+              {title}
+            </h2>
+          </div>
           {action}
         </div>
       )}

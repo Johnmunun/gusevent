@@ -13,6 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import { CmsImageField } from "@/components/admin/cms/CmsImageField";
 import {
   CmsFormField,
@@ -138,7 +139,7 @@ export function GalleryCmsEditor({
         </p>
       )}
 
-      <AdminCard title="Texte de la section" hover={false}>
+      <AdminCard title="Texte de la section" icon={ADMIN_CARD_ICONS.galleryText} hover={false}>
         <div className="grid gap-4 sm:grid-cols-3">
           <CmsFormField label="Surtitre">
             <input

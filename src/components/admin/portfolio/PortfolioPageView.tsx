@@ -17,6 +17,7 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { cloudinaryPreviewUrl, isCloudinaryUrl } from "@/lib/cloudinary/utils";
 import type { PortfolioData, PortfolioItem } from "@/lib/site/service";
@@ -376,7 +377,7 @@ export function PortfolioPageView() {
         </div>
       )}
 
-      <AdminCard title="Stockage des images" className="mt-8" hover={false}>
+      <AdminCard title="Stockage des images" icon={ADMIN_CARD_ICONS.storage} className="mt-8" hover={false}>
         <div className="flex items-start gap-3">
           <FolderOpen className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
           <div className="space-y-2 text-sm text-muted">

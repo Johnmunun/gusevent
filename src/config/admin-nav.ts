@@ -15,6 +15,7 @@ import {
   UserCog,
   Layout,
   MessageSquare,
+  IdCard,
 } from "lucide-react";
 import { PERMISSIONS, type Permission } from "@/lib/auth/permissions";
 
@@ -139,6 +140,17 @@ export const adminNavGroups: AdminNavGroup[] = [
         href: "/admin/marketing",
         icon: Sparkles,
         permission: PERMISSIONS.marketing,
+      },
+    ],
+  },
+  {
+    title: "Équipe",
+    items: [
+      {
+        label: "RH — Employés",
+        href: "/admin/rh",
+        icon: IdCard,
+        permission: PERMISSIONS.hr,
       },
     ],
   },

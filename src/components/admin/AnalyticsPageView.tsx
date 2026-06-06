@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import {
   ConversionChartAnimated,
@@ -116,6 +117,7 @@ export function AnalyticsPageView() {
         <ConversionChartAnimated data={data.conversionByMonth} />
         <AdminCard
           title="Leads à convertir"
+          icon={ADMIN_CARD_ICONS.nurtureLeads}
           action={
             <Link
               href="/admin/devis"

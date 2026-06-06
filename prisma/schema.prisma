@@ -54,6 +54,68 @@ enum TestimonialSubmissionStatus {
   REJECTED
 }
 
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+}
+
+enum EmployeeContractType {
+  CDI
+  CDD
+  FREELANCE
+  INTERN
+}
+
+enum PayslipStatus {
+  DRAFT
+  VALIDATED
+  PAID
+}
+
+model Employee {
+  id           String               @id @default(cuid())
+  fullName     String
+  email        String?
+  phone        String?
+  jobTitle     String
+  department   String?
+  contractType EmployeeContractType @default(CDI)
+  status       EmployeeStatus       @default(ACTIVE)
+  baseSalary   Float?
+  hireDate     DateTime?
+  notes        String?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  payslips     Payslip[]
+
+  @@index([status, fullName])
+  @@index([department])
+}
+
+model Payslip {
+  id          String        @id @default(cuid())
+  reference   String        @unique
+  employeeId  String
+  employee    Employee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  periodYear  Int
+  periodMonth Int
+  grossSalary Float
+  allowances  Float         @default(0)
+  deductions  Float         @default(0)
+  netSalary   Float
+  currency    String        @default("TND")
+  status      PayslipStatus @default(DRAFT)
+  paidAt      DateTime?
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([employeeId, periodYear, periodMonth])
+  @@index([periodYear, periodMonth])
+  @@index([status])
+}
+
 model QuoteRequest {
   id               String             @id @default(cuid())
   reference        String             @unique

@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { FileText, Loader2, Mail, MailX, Pencil } from "lucide-react";
+import { FileText, Inbox, Loader2, Mail, MailCheck, MailX, Pencil } from "lucide-react";
 import type { QuoteRequestStatus } from "@prisma/client";
 import { AdminCard } from "@/components/admin/AdminCard";
+import { AdminStatCard } from "@/components/admin/AdminStatCard";
+import { ADMIN_CARD_ICONS } from "@/lib/admin/card-icons";
 import { InvoiceGeneratorModal } from "@/components/admin/devis/InvoiceGeneratorModal";
 import { QuoteEditPanel } from "@/components/admin/devis/QuoteEditPanel";
 
@@ -74,23 +76,26 @@ export function QuoteRequestsList() {
   return (
     <>
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <div className="admin-card bg-surface p-5">
-          <p className="text-xs text-muted uppercase">Nouvelles</p>
-          <p className="mt-1 font-display text-2xl text-foreground">{newCount}</p>
-        </div>
-        <div className="admin-card bg-surface p-5">
-          <p className="text-xs text-muted uppercase">Total</p>
-          <p className="mt-1 font-display text-2xl text-foreground">{quotes.length}</p>
-        </div>
-        <div className="admin-card bg-surface p-5">
-          <p className="text-xs text-muted uppercase">Emails OK</p>
-          <p className="mt-1 font-display text-2xl text-foreground">
-            {quotes.filter((q) => q.clientEmailSent && q.adminEmailSent).length}
-          </p>
-        </div>
+        <AdminStatCard
+          label="Nouvelles"
+          value={String(newCount)}
+          trend={newCount > 0 ? "up" : "neutral"}
+          icon={Inbox}
+        />
+        <AdminStatCard
+          label="Total"
+          value={String(quotes.length)}
+          trend="neutral"
+        />
+        <AdminStatCard
+          label="Emails OK"
+          value={String(quotes.filter((q) => q.clientEmailSent && q.adminEmailSent).length)}
+          trend="up"
+          icon={MailCheck}
+        />
       </div>
 
-      <AdminCard title="File d'attente" noPadding>
+      <AdminCard title="File d'attente" icon={ADMIN_CARD_ICONS.queue} noPadding>
         {quotes.length === 0 ? (
           <p className="px-6 py-10 text-center text-sm text-muted">
             Aucune demande pour le moment.

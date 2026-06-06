@@ -16,6 +16,8 @@ export const PERMISSIONS = {
   cmsEdit: "cms.edit",
   users: "users.manage",
   settings: "settings.manage",
+  hr: "hr.view",
+  hrEdit: "hr.edit",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -37,6 +39,8 @@ export const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     PERMISSIONS.cms,
     PERMISSIONS.cmsEdit,
     PERMISSIONS.settings,
+    PERMISSIONS.hr,
+    PERMISSIONS.hrEdit,
   ],
   EDITOR: [
     PERMISSIONS.dashboard,
